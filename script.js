@@ -42,10 +42,15 @@ function handleStartClick() {
 }
 
 function addProcess(time) {
-  const div = document.createElement("div");
-  div.classList.add("process");
-  const clone = div.cloneNode();
-  clone.appendChild(document.createTextNode(time));
+  const processWrapper = document.createElement("div");
+  processWrapper.classList.add("process-wrapper");
+  const process = document.createElement("div");
+  process.classList.add("process");
+  const text = document.createElement("p");
+  text.innerText = time;
+  const clone = processWrapper.cloneNode();
+  clone.appendChild(process);
+  clone.appendChild(text);
   clone.style.width = `${time}px`;
   pipe.appendChild(clone);
 }
@@ -70,9 +75,25 @@ async function startProcessing() {
 }
 
 function startProcessingAnimation(node, time) {
-  node.classList.add("processing");
-  node.style.height = "0px";
-  node.style.transition = `${time * 20}ms`;
+  const nodeChild = node.firstElementChild;
+  const text = node.lastElementChild;
+  nodeChild.classList.add("processing");
+  nodeChild.style.transition = `${time * 20}ms`;
+  nodeChild.style.transitionTimingFunction = "linear";
+  nodeChild.style.height = "100px";
+  countDown(text, time);
+}
+
+function countDown(node, time) {
+  node.innerText = time;
+  time--;
+  let timeoutId;
+  clearTimeout(timeoutId);
+  if (time >= 0) {
+    timeoutId = setTimeout(() => {
+      countDown(node, time);
+    }, 20);
+  }
 }
 
 async function wait(time) {
