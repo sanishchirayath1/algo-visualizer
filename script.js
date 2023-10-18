@@ -41,7 +41,7 @@ function handleStartClick() {
   startProcessing();
 }
 
-function addProcess(time) {
+async function addProcess(time) {
   const processWrapper = document.createElement("div");
   processWrapper.classList.add("process-wrapper");
   const process = document.createElement("div");
@@ -51,8 +51,20 @@ function addProcess(time) {
   const clone = processWrapper.cloneNode();
   clone.appendChild(process);
   clone.appendChild(text);
+  clone.style.height = "100px";
   clone.style.width = `${time}px`;
+  clone.opacity = 0;
+  clone.style.transform = "translateX(500%)";
   pipe.appendChild(clone);
+  await wait(100);
+  animateAddition(clone);
+}
+
+function animateAddition(node) {
+  node.style.transition = "0.5s";
+  node.style.transitionTimingFunction = "linear";
+  node.style.transform = "translateX(0)";
+  node.style.opacity = 1;
 }
 
 function removeProcess() {
@@ -66,12 +78,24 @@ async function startProcessing() {
   const height = first.style.height;
   startProcessingAnimation(first, parseInt(time), height);
   await wait(time * 20);
-  pipe.removeChild(first);
+  // animate the removed element to top corner
+  await moveNodeToTop(first);
+  const removed = pipe.removeChild(first);
+  console.log(removed);
+
   if (pipe.childElementCount === 0) {
     alert("Queue is empty");
   } else {
     startProcessing();
   }
+}
+
+async function moveNodeToTop(node) {
+  node.style.transition = "1s";
+  node.style.transitionTimingFunction = "linear";
+  node.style.transform = "translateY(-400%)";
+  await wait(500);
+  node.style.opacity = 0;
 }
 
 function startProcessingAnimation(node, time) {
